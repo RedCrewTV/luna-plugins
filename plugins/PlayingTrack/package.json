@@ -1,0 +1,11 @@
+{
+	"name": "@redcrew/obs-playingtrack",
+	"description": "An window of the current playing track for obs",
+	"author": {
+		"name": "RedCrew",
+		"url": "https://github.com/RedCrewTV",
+		"avatarUrl": "https://avatars.githubusercontent.com/u/87731710?v=4"
+	},
+	"main": "./src/index.ts",
+	"type": "module"
+}

@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Playing Track Display</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap');
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "Montserrat", sans-serif;
+        }
+
+        .player-section {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: row;
+            gap: 24px;
+            -webkit-app-region: drag;
+        }
+        .album-cover {
+            width: 128px;
+            height: 128px;
+            box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
+            border-radius: 16px;
+            background-color: black;
+        }
+        .album-cover img {
+            width: 128px;
+            height: 128px;
+            border-radius: 16px;
+        }
+        #bg-image {
+            filter: blur(16px);
+            -webkit-filter: blur(16px);
+            border-radius: 16px;
+            height: 100%;
+            overflow: hidden;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-size: cover;
+        }
+        .song-info {
+            flex: 1;
+            max-height: 128px;
+            position: relative;
+            color: white;
+            background-size: cover;
+            box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
+            border-radius: 16px;
+            overflow: hidden;
+            background-color: black;
+        }
+        #content {
+            position: absolute;
+            inset: 0;
+            background-color: rgba(0,0,0, 0.4);
+            color: white;
+            font-weight: bold;
+            z-index: 2;
+            border-radius: 16px;
+            display: flex;
+            justify-content: space-between;
+            flex-direction: column;
+            padding: 16px;
+        }
+        .song-title {
+            font-weight: 600;
+            font-size: x-large;
+        }
+        .song-artist {
+            font-weight: 300;
+            font-size: large;
+            font-style: italic;
+        }
+
+        .progress-time {
+            font-weight: 500;
+            font-size: medium;
+            text-shadow: rgba(0, 0, 0, 0.24) 0px 3px 4px;
+            display: flex;
+            flex-direction: row;
+            justify-content: space-between;
+        }
+        .progress-bar {
+            background-color: rgb(29, 29, 29);
+            height: 8px;
+            width: 100%;
+            border-radius: 16px;
+        }
+        .progress-fill {
+            background-color: white;
+            height: 8px;
+            border-radius: 16px;
+        }
+        .progress-container {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        } 
+    </style>
+</head>
+
+<body>
+    <div class="player-section" id="playerSection">
+        <div class="album-cover" id="albumCover"></div>
+        <div class="song-info" id="song-info">
+            <div style="overflow: hidden; box-sizing: border-box; width: 100%;
+            height: 100%; border-radius: 16px;"><div id="bg-image"></div></div>
+            <div id="content">
+                <div>
+                    <div class="song-title" id="songTitle">No song playing</div>
+                    <div class="song-artist" id="songArtist">Unknown artist</div>
+                </div>
+                <div class="progress-container">
+                    <div class="progress-time">
+                        <span id="currentTime">0:00</span>
+                        <span id="totalTime">0:00</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progressFill"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function formatTime(seconds) {
+            const mins = Math.floor(seconds / 60);
+            const secs = Math.floor(seconds % 60);
+            return `${mins}:${secs.toString().padStart(2, '0')}`;
+        }
+
+        function updateProgress(current, total) {
+            const progressFill = document.getElementById('progressFill');
+            const currentTimeEl = document.getElementById('currentTime');
+            const totalTimeEl = document.getElementById('totalTime');
+
+            const percentage = total > 0 ? (current / total) * 100 : 0;
+            progressFill.style.width = `${percentage}%`;
+
+            currentTimeEl.textContent = formatTime(current);
+            totalTimeEl.textContent = formatTime(total);
+        }
+
+        function updateSongInfo(data) {
+            const titleEl = document.getElementById('songTitle');
+            const artistEl = document.getElementById('songArtist');
+            const coverEl = document.getElementById('albumCover');
+            const songEl = document.getElementById('bg-image');
+
+            const newTitle = data.title || 'No title';
+            const newArtist = data.artist?.tidalArtist?.name || 'Unknown artist';
+
+            titleEl.textContent = newTitle;
+            artistEl.textContent = newArtist;
+
+            if (data.coverUrl) {
+                coverEl.innerHTML = `<img src="${data.coverUrl}" alt="Album Cover">`;
+                songEl.style.backgroundImage = `url(${data.coverUrl})`
+            }
+        }
+
+        // Handle IPC updates
+        if (window.electronAPI?.onTrackUpdate) {
+            window.electronAPI.onTrackUpdate((data) => {
+                console.log("Processing song.update:", data);
+
+                data = JSON.parse(data);
+
+                try {
+                    updateSongInfo(data);
+
+                    if (typeof data.songProgress === 'number' && typeof data.songLength === 'number') {
+                        updateProgress(data.songProgress, data.songLength);
+                    }
+                } catch (err) {
+                    console.error('Error processing track update:', err);
+                }
+            });
+        } else {
+            console.log('electronAPI not available');
+        }
+
+        console.log('Playing Track display initialized. Waiting for track.update events...'); 
+    </script>
+</body>
+
+</html>

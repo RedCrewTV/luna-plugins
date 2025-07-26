@@ -1,6 +1,6 @@
 {
-	"name": "@luna/template",
-	"description": "Template repo for making your own luna plugins",
+	"name": "@redcrew/luna-plugins",
+	"description": "Plugins for Tidal Luna",
 	"type": "module",
 	"scripts": {
 		"watch": "concurrently \"pnpm:build --watch\" pnpm:serve",
@@ -8,6 +8,7 @@
 		"serve": "http-server ./dist -p 3000 -s --cors -c-1"
 	},
 	"devDependencies": {
+		"@inrixia/helpers": "^3.15.1",
 		"@types/node": "^22.15.29",
 		"@types/react": "^19.1.6",
 		"@types/react-dom": "^19.1.5",
@@ -16,7 +17,9 @@
 		"luna": "github:Inrixia/TidaLuna#81369c7",
 		"oby": "^15.1.2",
 		"rimraf": "^6.0.1",
+		"ts-node": "^10.9.1",
 		"tsx": "^4.19.4",
-		"typescript": "^5.8.3"
+		"typescript": "^5.8.3",
+		"electron": "^36.1.0"
 	}
 }
