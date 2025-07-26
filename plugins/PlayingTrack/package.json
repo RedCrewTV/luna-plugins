@@ -1,6 +1,6 @@
 {
 	"name": "@redcrew/obs-playingtrack",
-	"description": "An window of the current playing track for obs",
+	"description": "An window of the current playing track for OBS",
 	"author": {
 		"name": "RedCrew",
 		"url": "https://github.com/RedCrewTV",
